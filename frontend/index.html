@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IT Help Desk</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <h1>IT Help Desk</h1>
+
+    <div class="ticket-form">
+        <input type="text" id="title" placeholder="Ticket Title">
+        <textarea id="description" placeholder="Describe your issue"></textarea>
+        <button onclick="createTicket()">Submit Ticket</button>
+    </div>
+
+    <h2>All Tickets</h2>
+    <div id="tickets-list"></div>
+
+    <script src="script.js"></script>
+</body>
+</html>
