@@ -18,6 +18,8 @@ mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopol
 const TicketSchema = new mongoose.Schema({
     title: String,
     description: String,
+    department: String, // NEW FIELD
+    category: String, // NEW FIELD
     status: { type: String, default: "Open" },
     createdAt: { type: Date, default: Date.now }
 });
@@ -36,18 +38,6 @@ app.post('/tickets', async (req, res) => {
 app.get('/tickets', async (req, res) => {
     const tickets = await Ticket.find();
     res.json(tickets);
-});
-
-// Update Ticket Status
-app.put('/tickets/:id', async (req, res) => {
-    await Ticket.findByIdAndUpdate(req.params.id, req.body);
-    res.json({ message: "✅ Ticket Updated" });
-});
-
-// Delete Ticket
-app.delete('/tickets/:id', async (req, res) => {
-    await Ticket.findByIdAndDelete(req.params.id);
-    res.json({ message: "✅ Ticket Deleted" });
 });
 
 // Start Server

@@ -1,71 +1,43 @@
-const API_URL = "http://localhost:5000";
+const API_URL = "http://localhost:5000"; // Change to deployed backend URL if needed
 
-// Create Ticket
-function createTicket() {
+// Create Ticket Function
+async function createTicket() {
     const title = document.getElementById("title").value;
     const description = document.getElementById("description").value;
+    const department = document.getElementById("department").value;
+    const category = document.getElementById("category").value;
 
-    fetch(`${API_URL}/tickets`, {
+    const response = await fetch(`${API_URL}/tickets`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ title, description })
-    })
-    .then(response => response.json())
-    .then(() => {
-        alert("✅ Ticket Created!");
-        loadTickets();
-    })
-    .catch(error => console.error("Error:", error));
+        body: JSON.stringify({ title, description, department, category })
+    });
+
+    const data = await response.json();
+    document.getElementById("response").innerText = data.message;
+    loadTickets();
 }
 
 // Load All Tickets
-function loadTickets() {
-    fetch(`${API_URL}/tickets`)
-    .then(response => response.json())
-    .then(tickets => {
-        let ticketList = "";
-        tickets.forEach(ticket => {
-            ticketList += `
-                <div class="ticket">
-                    <h3>${ticket.title}</h3>
-                    <p>${ticket.description}</p>
-                    <p>Status: ${ticket.status}</p>
-                    <button onclick="updateTicket('${ticket._id}')">Mark as Closed</button>
-                    <button onclick="deleteTicket('${ticket._id}')">Delete</button>
-                </div>
-            `;
-        });
-        document.getElementById("tickets-list").innerHTML = ticketList;
-    })
-    .catch(error => console.error("Error:", error));
-}
+async function loadTickets() {
+    const response = await fetch(`${API_URL}/tickets`);
+    const tickets = await response.json();
+    let ticketList = "";
 
-// Update Ticket Status
-function updateTicket(id) {
-    fetch(`${API_URL}/tickets/${id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ status: "Closed" })
-    })
-    .then(() => loadTickets())
-    .catch(error => console.error("Error:", error));
-}
+    tickets.forEach(ticket => {
+        ticketList += `
+            <div class="ticket">
+                <h3>${ticket.title}</h3>
+                <p><strong>Department:</strong> ${ticket.department}</p>
+                <p><strong>Category:</strong> ${ticket.category}</p>
+                <p>${ticket.description}</p>
+                <p><strong>Status:</strong> ${ticket.status}</p>
+            </div>
+        `;
+    });
 
-// Delete Ticket
-function deleteTicket(id) {
-    fetch(`${API_URL}/tickets/${id}`, { method: "DELETE" })
-    .then(() => loadTickets())
-    .catch(error => console.error("Error:", error));
+    document.getElementById("tickets-list").innerHTML = ticketList;
 }
 
 // Load Tickets on Page Load
 window.onload = loadTickets;
-    
-    // The script.js file contains the JavaScript code to interact with the API. The createTicket() function sends a POST request to the API to create a new ticket. 
-    // The loadTickets() function sends a GET request to the API to fetch all tickets and display them on the
-    //  page. The updateTicket() function sends a PUT request to the API to update the status of a ticket to
-    //  "Closed". The deleteTicket() function sends a DELETE request to the API to delete a ticket. 
-    // Step 6: Run the Application 
-    // To run the application, navigate to the frontend directory and start the development server
-    // using the following command: 
-    // cd frontend
