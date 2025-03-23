@@ -8,36 +8,52 @@
     <script defer src="script.js"></script>
 </head>
 <body>
-    <h2>Create a Support Ticket</h2>
-
-    <label for="title">Title:</label>
-    <input type="text" id="title" placeholder="Enter Ticket Title">
-
-    <label for="description">Description:</label>
-    <textarea id="description" placeholder="Describe your issue"></textarea>
-
-    <!-- Department Dropdown -->
-    <label for="department">Select Department:</label>
-    <select id="department">
-        <option value="IT Support">IT Support</option>
-        <option value="Networking">Networking</option>
-        <option value="Software">Software</option>
-        <option value="Hardware">Hardware</option>
+    <h2>Register</h2>
+    <input type="text" id="regName" placeholder="Enter Name">
+    <input type="email" id="regEmail" placeholder="Enter Email">
+    <input type="password" id="regPassword" placeholder="Enter Password">
+    <select id="regRole">
+        <option value="employee">Employee</option>
+        <option value="it_staff">IT Staff</option>
     </select>
+    <button onclick="register()">Register</button>
 
-    <!-- Issue Category Dropdown -->
-    <label for="category">Select Issue Category:</label>
-    <select id="category">
-        <option value="Login Issue">Login Issue</option>
-        <option value="Software Bug">Software Bug</option>
-        <option value="Network Issue">Network Issue</option>
-        <option value="Hardware Failure">Hardware Failure</option>
-    </select>
+    <h2>Login</h2>
+    <input type="email" id="loginEmail" placeholder="Enter Email">
+    <input type="password" id="loginPassword" placeholder="Enter Password">
+    <button onclick="login()">Login</button>
 
-    <button onclick="createTicket()">Submit Ticket</button>
-    <p id="response"></p>
+    <p id="authMessage"></p>
 
-    <h2>All Tickets</h2>
-    <div id="tickets-list"></div>
+    <!-- Employee Panel: Create & View Tickets -->
+    <div id="employeePanel" style="display: none;">
+        <h2>Create a Support Ticket</h2>
+        <input type="text" id="title" placeholder="Enter Ticket Title">
+        <textarea id="description" placeholder="Describe your issue"></textarea>
+        <select id="department">
+            <option value="IT Support">IT Support</option>
+            <option value="Networking">Networking</option>
+            <option value="Software">Software</option>
+            <option value="Hardware">Hardware</option>
+        </select>
+        <select id="category">
+            <option value="Login Issue">Login Issue</option>
+            <option value="Software Bug">Software Bug</option>
+            <option value="Network Issue">Network Issue</option>
+            <option value="Hardware Failure">Hardware Failure</option>
+        </select>
+        <button onclick="createTicket()">Submit Ticket</button>
+
+        <h2>Your Tickets</h2>
+        <button onclick="loadMyTickets()">View My Tickets</button>
+        <div id="my-tickets-list"></div>
+    </div>
+
+    <!-- IT Staff Panel -->
+    <div id="itStaffPanel" style="display: none;">
+        <h2>Manage Tickets (IT Staff Only)</h2>
+        <button onclick="loadTickets()">View All Tickets</button>
+        <div id="tickets-list"></div>
+    </div>
 </body>
 </html>
