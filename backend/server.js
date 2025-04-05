@@ -11,6 +11,7 @@ app.use(express.json());
 app.use(cors());
 app.use(bodyParser.urlencoded({ extended: true }));
 
+// MongoDB Connection
 mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
     .then(() => console.log("✅ MongoDB Connected"))
     .catch(err => console.log(err));
@@ -30,12 +31,14 @@ const TicketSchema = new mongoose.Schema({
     description: String,
     department: String,
     category: String,
-    status: { type: String, default: "Open" }, // NEW FIELD
-    createdAt: { type: Date, default: Date.now }
+    status: { type: String, default: "Open" },
+    createdAt: { type: Date, default: Date.now },
+    //createdBy: req.user.id,
+    //createdByName: req.user.name,
 });
 const Ticket = mongoose.model('Ticket', TicketSchema);
 
-// Register User
+// Register
 app.post("/register", async (req, res) => {
     const { name, email, password, role } = req.body;
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -49,7 +52,7 @@ app.post("/register", async (req, res) => {
     }
 });
 
-// Login User
+// Login
 app.post("/login", async (req, res) => {
     const { email, password } = req.body;
     const user = await User.findOne({ email });
@@ -57,11 +60,11 @@ app.post("/login", async (req, res) => {
     if (!user || !(await bcrypt.compare(password, user.password)))
         return res.status(401).json({ error: "❌ Invalid Credentials" });
 
-    const token = jwt.sign({ userId: user._id, role: user.role }, "secret_key", { expiresIn: "1h" });
+    const token = jwt.sign({ userId: user._id, role: user.role, name: user.name }, "secret_key", { expiresIn: "1h" });
     res.json({ message: "✅ Login Successful", token, role: user.role });
 });
 
-// Middleware for Authentication
+// Auth Middleware
 const authenticate = (req, res, next) => {
     const token = req.headers.authorization?.split(" ")[1];
     if (!token) return res.status(401).json({ error: "❌ Unauthorized" });
@@ -75,34 +78,52 @@ const authenticate = (req, res, next) => {
     }
 };
 
-// Create Ticket (Employees only)
+// Create Ticket (Employee)
 app.post('/tickets', authenticate, async (req, res) => {
-    if (req.user.role !== "employee") return res.status(403).json({ error: "❌ Only employees can create tickets" });
+    if (req.user.role !== "employee")
+        return res.status(403).json({ error: "❌ Only employees can create tickets" });
 
-    const ticket = new Ticket(req.body);
+    const ticket = new Ticket({
+        ...req.body,
+        createdBy: req.user.id,
+        createdByName: req.user.name
+    });
+
     await ticket.save();
     res.json({ message: "✅ Ticket Created", ticket });
 });
 
-// Get All Tickets (IT Staff only)
+// View Own Tickets (Employee)
+app.get('/my-tickets', authenticate, async (req, res) => {
+    if (req.user.role !== "employee")
+        return res.status(403).json({ error: "❌ Access Denied" });
+
+    const tickets = await Ticket.find({ createdBy: req.user.userId });
+    res.json(tickets);
+});
+
+// View All Tickets (IT Staff)
 app.get('/tickets', authenticate, async (req, res) => {
-    if (req.user.role !== "it_staff") return res.status(403).json({ error: "❌ Access Denied" });
+    if (req.user.role !== "it_staff")
+        return res.status(403).json({ error: "❌ Access Denied" });
 
     const tickets = await Ticket.find();
     res.json(tickets);
 });
 
-// Update Ticket Status (IT Staff only)
+// Update Ticket Status (IT Staff)
 app.put('/tickets/:id', authenticate, async (req, res) => {
-    if (req.user.role !== "it_staff") return res.status(403).json({ error: "❌ Access Denied" });
+    if (req.user.role !== "it_staff")
+        return res.status(403).json({ error: "❌ Access Denied" });
 
     await Ticket.findByIdAndUpdate(req.params.id, { status: req.body.status });
     res.json({ message: "✅ Ticket Updated" });
 });
 
-// Delete Ticket (IT Staff only)
+// Delete Ticket (IT Staff)
 app.delete('/tickets/:id', authenticate, async (req, res) => {
-    if (req.user.role !== "it_staff") return res.status(403).json({ error: "❌ Access Denied" });
+    if (req.user.role !== "it_staff")
+        return res.status(403).json({ error: "❌ Access Denied" });
 
     await Ticket.findByIdAndDelete(req.params.id);
     res.json({ message: "✅ Ticket Deleted" });

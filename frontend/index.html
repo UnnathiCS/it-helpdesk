@@ -1,59 +1,132 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IT Help Desk</title>
-    <link rel="stylesheet" href="style.css">
-    <script defer src="script.js"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>IT Help Desk</title>
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="styles.css"/>
+
+  <!-- Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" crossorigin="anonymous" />
+  
+  <!-- Animations -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+  <link href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css" rel="stylesheet" />
 </head>
 <body>
-    <h2>Register</h2>
-    <input type="text" id="regName" placeholder="Enter Name">
-    <input type="email" id="regEmail" placeholder="Enter Email">
-    <input type="password" id="regPassword" placeholder="Enter Password">
-    <select id="regRole">
-        <option value="employee">Employee</option>
-        <option value="it_staff">IT Staff</option>
-    </select>
-    <button onclick="register()">Register</button>
 
-    <h2>Login</h2>
-    <input type="email" id="loginEmail" placeholder="Enter Email">
-    <input type="password" id="loginPassword" placeholder="Enter Password">
-    <button onclick="login()">Login</button>
+  <!-- Header -->
+  <header class="main-header animate__animated animate__fadeInDown">
+    <h1>IT Help Desk</h1>
+  </header>
 
-    <p id="authMessage"></p>
+  <main class="container">
 
-    <!-- Employee Panel: Create & View Tickets -->
-    <div id="employeePanel" style="display: none;">
-        <h2>Create a Support Ticket</h2>
-        <input type="text" id="title" placeholder="Enter Ticket Title">
-        <textarea id="description" placeholder="Describe your issue"></textarea>
-        <select id="department">
+    <!-- Register -->
+    <section data-aos="fade-up">
+      <h2><i class="fa fa-user-plus"></i> Register</h2>
+      <form id="registerForm">
+        <input type="text" id="regName" placeholder="Enter Name">
+        <input type="email" id="regEmail" placeholder="Enter Email">
+        <input type="password" id="regPassword" placeholder="Enter Password">
+        <select id="regRole">
+          <option value="employee">Employee</option>
+          <option value="it_staff">IT Staff</option>
+        </select>
+        <button type="button" onclick="register()"><i class="fa fa-user-plus"></i> Register</button>
+      </form>
+    </section>
+
+    <!-- Login -->
+    <section data-aos="fade-up">
+      <h2><i class="fa fa-sign-in-alt"></i> Login</h2>
+      <form id="loginForm">
+        <input type="email" id="loginEmail" placeholder="Enter Email">
+        <input type="password" id="loginPassword" placeholder="Enter Password">
+        <button type="button" onclick="login()"><i class="fa fa-sign-in-alt"></i> Login</button>
+      </form>
+      <p id="authMessage"></p>
+    </section>
+
+    <!-- Employee Panel -->
+    <section id="employeePanel" style="display: none; max-width: 600px; margin: 40px auto; padding: 30px; background-color: #f9f9f9; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1);" data-aos="fade-up">
+        <h2 style="text-align: center; margin-bottom: 25px;"><i class="fa-solid fa-ticket"></i> Create a Support Ticket</h2>
+      
+        <div style="margin-bottom: 20px;">
+          <label for="title" style="display: block; margin-bottom: 6px; font-weight: 600;">Ticket Title</label>
+          <input type="text" id="title" placeholder="Enter Ticket Title"
+                 style="width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 5px;">
+        </div>
+      
+        <div style="margin-bottom: 20px;">
+          <label for="description" style="display: block; margin-bottom: 6px; font-weight: 600;">Description</label>
+          <textarea id="description" placeholder="Describe your issue" rows="5"
+                    style="width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 5px;"></textarea>
+        </div>
+      
+        <div style="margin-bottom: 20px;">
+          <label for="department" style="display: block; margin-bottom: 6px; font-weight: 600;">Department</label>
+          <select id="department"
+                  style="width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 5px;">
+            <option value="">Select Department</option>
             <option value="IT Support">IT Support</option>
             <option value="Networking">Networking</option>
             <option value="Software">Software</option>
             <option value="Hardware">Hardware</option>
-        </select>
-        <select id="category">
+          </select>
+        </div>
+      
+        <div style="margin-bottom: 30px;">
+          <label for="category" style="display: block; margin-bottom: 6px; font-weight: 600;">Category</label>
+          <select id="category"
+                  style="width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 5px;">
+            <option value="">Select Category</option>
             <option value="Login Issue">Login Issue</option>
             <option value="Software Bug">Software Bug</option>
             <option value="Network Issue">Network Issue</option>
             <option value="Hardware Failure">Hardware Failure</option>
-        </select>
-        <button onclick="createTicket()">Submit Ticket</button>
-
-        <h2>Your Tickets</h2>
-        <button onclick="loadMyTickets()">View My Tickets</button>
+          </select>
+        </div>
+      
+        <button onclick="createTicket()"
+                style="width: 100%; padding: 12px; background-color: #007bff; color: white; border: none; border-radius: 5px; font-weight: bold; font-size: 16px;">
+          <i class="fa fa-paper-plane"></i> Submit Ticket
+        </button>
+      
+        <hr style="margin: 40px 0;">
+      
+        <h2 style="text-align: center;"><i class="fa-solid fa-eye"></i> Your Tickets</h2>
+        <div style="text-align: center; margin-bottom: 20px;">
+          <button onclick="loadMyTickets()"
+                  style="padding: 10px 25px; background-color: #17a2b8; color: white; border: none; border-radius: 5px;">
+            <i class="fa-solid fa-eye"></i> View My Tickets
+          </button>
+        </div>
         <div id="my-tickets-list"></div>
-    </div>
+      </section>
+      
 
-    <!-- IT Staff Panel (for it staff)-->
-    <div id="itStaffPanel" style="display: none;">
-        <h2>Manage Tickets (IT Staff Only)</h2>
-        <button onclick="loadTickets()">View All Tickets</button>
-        <div id="tickets-list"></div>
-    </div>
+
+    <!-- IT Staff Panel -->
+    <section id="itStaffPanel" style="display: none;" data-aos="fade-up">
+      <h2><i class="fa fa-tools"></i> Manage Tickets</h2>
+      <button onclick="loadTickets()"><i class="fa fa-eye"></i> View All Tickets</button>
+      <div id="tickets-list"></div>
+    </section>
+<!-- Logout Button -->
+<div id="logoutSection" style="display: none; text-align: center; margin-top: 30px;" data-aos="fade-up">
+    <button onclick="logout()" class="logout-btn">
+    <i class="fa fa-sign-out-alt"></i> Logout</button>
+  </div>
+  
+  </main>
+
+  <!-- Scripts -->
+  <script src="script.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></script>
+  <script>AOS.init();</script>
+
 </body>
 </html>
