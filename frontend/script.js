@@ -98,7 +98,12 @@ async function createTicket() {
       'Content-Type': 'application/json',
       'Authorization': `Bearer ${token}`
     },
-    body: JSON.stringify({ title, description, department, category })
+    body: JSON.stringify({ 
+      title, 
+      description, 
+      department, 
+      category 
+    }) // No need to send userId explicitly; backend extracts it from the token
   });
 
   const data = await res.json();
@@ -112,18 +117,41 @@ async function createTicket() {
 
 // EMPLOYEE - VIEW OWN TICKETS
 async function loadMyTickets() {
-  const res = await fetch(`${BASE_URL}/my-tickets`, {
-    headers: { 'Authorization': `Bearer ${token}` }
-  });
+  try {
+    const res = await fetch(`${BASE_URL}/my-tickets`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
 
-  const tickets = await res.json();
-  const container = document.getElementById('my-tickets-list');
-  container.innerHTML = '';
-  tickets.forEach(ticket => {
-    const div = document.createElement('div');
-    div.innerHTML = `<strong>${ticket.title}</strong><br>${ticket.description}<br>Status: ${ticket.status}<hr>`;
-    container.appendChild(div);
-  });
+    if (!res.ok) {
+      const error = await res.json();
+      alert(error.message || 'Failed to load tickets.');
+      return;
+    }
+
+    const tickets = await res.json();
+    const container = document.getElementById('my-tickets-list');
+    container.innerHTML = '';
+
+    if (tickets.length === 0) {
+      container.innerHTML = '<p>No tickets found.</p>';
+      return;
+    }
+
+    tickets.forEach(ticket => {
+      const div = document.createElement('div');
+      div.innerHTML = `
+        <strong>${ticket.title}</strong><br>
+        ${ticket.description}<br>
+        Department: ${ticket.department}<br>
+        Category: ${ticket.category}<br>
+        Status: ${ticket.status}<br>
+        Created At: ${new Date(ticket.createdAt).toLocaleString()}<hr>
+      `;
+      container.appendChild(div);
+    });
+  } catch (error) {
+    alert('An error occurred while loading tickets.');
+  }
 }
 
 // IT STAFF - VIEW ALL TICKETS

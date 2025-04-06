@@ -96,3 +96,10 @@ h2 {
 .logout-btn:hover {
   background-color: #c82333;
 }
+
+#logoutSection {
+  position: center;
+  bottom: 20px;
+  right: 20px;
+  z-index: 1000;
+}

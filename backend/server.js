@@ -33,8 +33,8 @@ const TicketSchema = new mongoose.Schema({
     category: String,
     status: { type: String, default: "Open" },
     createdAt: { type: Date, default: Date.now },
-    //createdBy: req.user.id,
-    //createdByName: req.user.name,
+    createdBy: String,
+    createdByName: String,
 });
 const Ticket = mongoose.model('Ticket', TicketSchema);
 
@@ -85,21 +85,26 @@ app.post('/tickets', authenticate, async (req, res) => {
 
     const ticket = new Ticket({
         ...req.body,
-        createdBy: req.user.id,
-        createdByName: req.user.name
+        createdBy: req.user.userId, // Extract userId from the token
+        createdByName: req.user.name // Extract user name from the token
     });
 
-    await ticket.save();
-    res.json({ message: "✅ Ticket Created", ticket });
+    try {
+        await ticket.save();
+        res.json({ message: "✅ Ticket Created", ticket });
+    } catch (error) {
+        res.status(500).json({ error: "Error creating ticket" });
+    }
 });
 
 // View Own Tickets (Employee)
 app.get('/my-tickets', authenticate, async (req, res) => {
-    if (req.user.role !== "employee")
-        return res.status(403).json({ error: "❌ Access Denied" });
-
-    const tickets = await Ticket.find({ createdBy: req.user.userId });
-    res.json(tickets);
+    try {
+        const tickets = await Ticket.find({ createdBy: req.user.userId });
+        res.json(tickets);
+    } catch (error) {
+        res.status(500).json({ message: 'Error fetching tickets' });
+    }
 });
 
 // View All Tickets (IT Staff)
