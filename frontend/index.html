@@ -19,14 +19,30 @@
 
   <!-- Header -->
   <header class="main-header animate__animated animate__fadeInDown">
-    <h1>IT Help Desk</h1>
+    <h1><i class="fa-solid fa-headset"></i> IT Help Desk</h1>
   </header>
 
   <main class="container">
 
+    <!-- Message Container -->
+    <div id="messageContainer" style="display: none;"></div>
+
+    <!-- Toggle Section -->
+    <section id="toggleSection" data-aos="fade-up">
+      <h2><i class="fa-solid fa-question-circle"></i> Welcome to IT Help Desk</h2>
+      <div style="text-align: center; margin-top: 20px;">
+        <button onclick="showRegister()" style="margin-right: 10px;" class="toggle-btn">
+          <i class="fa-solid fa-user-plus"></i> New Employee? Register
+        </button>
+        <button onclick="showLogin()" class="toggle-btn">
+          <i class="fa-solid fa-sign-in-alt"></i> Already working with us? Login
+        </button>
+      </div>
+    </section>
+
     <!-- Register -->
-    <section data-aos="fade-up">
-      <h2><i class="fa fa-user-plus"></i> Register</h2>
+    <section id="registerSection" style="display: none;" data-aos="fade-up">
+      <h2><i class="fa-solid fa-user-plus"></i> Register</h2>
       <form id="registerForm">
         <input type="text" id="regName" placeholder="Enter Name">
         <input type="email" id="regEmail" placeholder="Enter Email">
@@ -37,14 +53,21 @@
         </select>
         <button type="button" onclick="register()"><i class="fa fa-user-plus"></i> Register</button>
       </form>
+      <p id="authMessage" style="color: var(--success-color); font-weight: bold;"></p>
     </section>
 
     <!-- Login -->
-    <section data-aos="fade-up">
-      <h2><i class="fa fa-sign-in-alt"></i> Login</h2>
+    <section id="loginSection" style="display: none;" data-aos="fade-up">
+      <h2><i class="fa-solid fa-sign-in-alt"></i> Login</h2>
       <form id="loginForm">
-        <input type="email" id="loginEmail" placeholder="Enter Email">
-        <input type="password" id="loginPassword" placeholder="Enter Password">
+        <div style="margin-bottom: 15px;">
+          <label for="loginEmail" style="display: block; margin-bottom: 6px; font-weight: 600;">Email</label>
+          <input type="email" id="loginEmail" placeholder="Enter Email">
+        </div>
+        <div style="margin-bottom: 15px;">
+          <label for="loginPassword" style="display: block; margin-bottom: 6px; font-weight: 600;">Password</label>
+          <input type="password" id="loginPassword" placeholder="Enter Password">
+        </div>
         <button type="button" onclick="login()"><i class="fa fa-sign-in-alt"></i> Login</button>
       </form>
       <p id="authMessage"></p>
@@ -78,7 +101,7 @@
           </select>
         </div>
       
-        <div style="margin-bottom: 30px;">
+        <div style="margin-bottom: 20px;">
           <label for="category" style="display: block; margin-bottom: 6px; font-weight: 600;">Category</label>
           <select id="category"
                   style="width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 5px;">
@@ -94,6 +117,9 @@
                 style="width: 100%; padding: 12px; background-color: #007bff; color: white; border: none; border-radius: 5px; font-weight: bold; font-size: 16px;">
           <i class="fa fa-paper-plane"></i> Submit Ticket
         </button>
+
+        <!-- Message container for ticket creation -->
+        <div id="ticketMessageContainer" style="margin-top: 15px;"></div>
       
         <hr style="margin: 40px 0;">
       
@@ -111,14 +137,14 @@
 
     <!-- IT Staff Panel -->
     <section id="itStaffPanel" style="display: none;" data-aos="fade-up">
-      <h2><i class="fa fa-tools"></i> Manage Tickets</h2>
+      <h2><i class="fa-solid fa-tools"></i> Manage Tickets</h2>
       <button onclick="loadTickets()"><i class="fa fa-eye"></i> View All Tickets</button>
       <div id="tickets-list"></div>
     </section>
 <!-- Logout Button -->
 <div id="logoutSection" style="display: none; text-align: center; margin-top: 30px;" data-aos="fade-up">
     <button onclick="logout()" class="logout-btn">
-    <i class="fa fa-sign-out-alt"></i> Logout</button>
+    <i class="fa-solid fa-sign-out-alt"></i> Logout</button>
   </div>
   
   </main>

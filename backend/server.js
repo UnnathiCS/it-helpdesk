@@ -61,7 +61,12 @@ app.post("/login", async (req, res) => {
         return res.status(401).json({ error: "❌ Invalid Credentials" });
 
     const token = jwt.sign({ userId: user._id, role: user.role, name: user.name }, "secret_key", { expiresIn: "1h" });
-    res.json({ message: "✅ Login Successful", token, role: user.role });
+    res.json({ 
+        message: "✅ Login Successful", 
+        token, 
+        role: user.role, 
+        name: user.name // Include the user's name in the response
+    });
 });
 
 // Auth Middleware
