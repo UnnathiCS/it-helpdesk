@@ -29,7 +29,7 @@
 
     <!-- Toggle Section -->
     <section id="toggleSection" data-aos="fade-up">
-      <h2><i class="fa-solid fa-question-circle"></i> Welcome to IT Help Desk</h2>
+      <h2> Welcome to IT Help Desk</h2>
       <div style="text-align: center; margin-top: 20px;">
         <button onclick="showRegister()" style="margin-right: 10px;" class="toggle-btn">
           <i class="fa-solid fa-user-plus"></i> New Employee? Register
@@ -141,6 +141,7 @@
       <button onclick="loadTickets()"><i class="fa fa-eye"></i> View All Tickets</button>
       <div id="tickets-list"></div>
     </section>
+
 <!-- Logout Button -->
 <div id="logoutSection" style="display: none; text-align: center; margin-top: 30px;" data-aos="fade-up">
     <button onclick="logout()" class="logout-btn">
@@ -149,10 +150,46 @@
   
   </main>
 
+  <!-- Chatbot Popup -->
+  <div id="chatbotPopup" style="display: none; position: fixed; bottom: 20px; right: 20px; background: white; border: 1px solid #ccc; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); padding: 15px; z-index: 1000;">
+    <textarea id="chatInput" placeholder="Describe your issue..." rows="3" style="width: 100%; margin-bottom: 10px;"></textarea>
+    <button onclick="sendToChatbot()" style="width: 100%; padding: 10px; background-color: #007bff; color: white; border: none; border-radius: 5px; font-weight: bold;">Ask Chatbot</button>
+    <div id="chatbotResponse" style="margin-top: 10px; color: #333;"></div>
+  </div>
+
   <!-- Scripts -->
   <script src="script.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></script>
   <script>AOS.init();</script>
+  
+  <script>
+    (function(){if(!window.chatbase||window.chatbase("getState")!=="initialized"){window.chatbase=(...arguments)=>{if(!window.chatbase.q){window.chatbase.q=[]}window.chatbase.q.push(arguments)};window.chatbase=new Proxy(window.chatbase,{get(target,prop){if(prop==="q"){return target.q}return(...args)=>target(prop,...args)}})}const onLoad=function(){const script=document.createElement("script");script.src="https://www.chatbase.co/embed.min.js";script.id="9MgPuSbtbjb5rRRpsLzjK";script.domain="www.chatbase.co";document.body.appendChild(script)};if(document.readyState==="complete"){onLoad()}else{window.addEventListener("load",onLoad)}})();
+  </script>
+  <script>
+    function sendToChatbot() {
+      const userInput = document.getElementById('chatInput').value;
+      fetch('/api/chatbot', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ query: userInput }),
+      })
+        .then(response => response.json())
+        .then(data => {
+          document.getElementById('chatbotResponse').innerText = data.response;
+        });
+    }
+  </script>
 
+  <style>
+    body {
+      background: url('back_2.gif') no-repeat center center fixed;
+      background-size: cover;
+    }
+    .dark-mode {
+      background-color: #121212;
+      color: #ffffff;
+    }
+  </style>
 </body>
+
 </html>

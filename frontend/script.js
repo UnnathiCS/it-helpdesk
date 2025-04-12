@@ -300,3 +300,30 @@ function displayMessage(message, type) {
     messageContainer.style.display = 'none';
   }, 5000);
 }
+
+// Display chatbot popup message
+function showChatbotPopup() {
+  const popup = document.getElementById("chatbotPopup");
+  popup.innerText = "☺️ Hey, if you need any help, I'm your IT assistant!✨";
+  popup.style.position = "fixed";
+  popup.style.bottom = "100px";
+  popup.style.right = "30px";
+  popup.style.backgroundColor = "#024956";
+  popup.style.color = "white";
+  popup.style.padding = "10px 15px";
+  popup.style.borderRadius = "8px";
+  popup.style.boxShadow = "0 4px 6px rgba(0, 0, 0, 0.1)";
+  popup.style.fontSize = "14px";
+  popup.style.zIndex = "1000";
+  popup.style.display = "block";
+  popup.style.animation = "fadeIn 1s ease-in-out";
+
+  // Remove popup after 5 seconds
+  setTimeout(() => {
+    popup.style.animation = "fadeOut 1s ease-in-out";
+    setTimeout(() => popup.style.display = "none", 1000);
+  }, 5000);
+}
+
+// Call the function when the page loads
+window.addEventListener("load", showChatbotPopup);
