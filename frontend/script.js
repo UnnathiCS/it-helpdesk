@@ -72,6 +72,7 @@ async function login() {
   if (data.token) {
     token = data.token; // Set the token
     userRole = data.role; // Set the user's role
+    localStorage.setItem('userId', data.userId);
     const userName = data.name; // Get the user's name
 
     showDialog(`🎉 Welcome back, ${userName}!`, 'success', 'loginForm');
@@ -185,14 +186,26 @@ async function loadMyTickets() {
       const div = document.createElement('div');
       div.className = 'employee-ticket-card';
       const statusClass = ticket.status.toLowerCase().replace(' ', '-');
-      div.innerHTML = `
-        <h3>${ticket.title}</h3>
-        <p><strong>Description:</strong> ${ticket.description}</p>
-        <p><strong>Department:</strong> ${ticket.department}</p>
-        <p><strong>Category:</strong> ${ticket.category}</p>
-        <p><strong>Status:</strong> <span class="status ${statusClass}">${ticket.status}</span></p>
-        <p><strong>Created At:</strong> ${new Date(ticket.createdAt).toLocaleString()}</p>
-      `;
+      // Inside the ticket creation in loadMyTickets, add:
+// Inside the ticket creation in loadMyTickets:
+div.innerHTML = `
+    <h3>${ticket.title}</h3>
+    <p><strong>Description:</strong> ${ticket.description}</p>
+    <p><strong>Department:</strong> ${ticket.department}</p>
+    <p><strong>Category:</strong> ${ticket.category}</p>
+    <p><strong>Status:</strong> <span class="status ${statusClass}">${ticket.status}</span></p>
+    <p><strong>Created At:</strong> ${new Date(ticket.createdAt).toLocaleString()}</p>
+    <button onclick="openChat('${ticket._id}')" class="chat-btn">
+        <i class="fas fa-comments"></i> Chat with IT
+    </button>
+    <div id="chat-container-${ticket._id}" class="chat-container" style="display: none;">
+        <div id="chat-messages-${ticket._id}" class="chat-messages"></div>
+        <div class="chat-input-container">
+            <input type="text" id="chat-input-${ticket._id}" class="chat-input" placeholder="Type your message...">
+            <button onclick="sendChatMessage('${ticket._id}')" class="chat-btn">Send</button>
+        </div>
+    </div>
+`;
       container.appendChild(div);
     });
 
@@ -219,21 +232,33 @@ async function loadTickets() {
   tickets.forEach(ticket => {
     const div = document.createElement('div');
     div.className = 'ticket-card';
-    div.innerHTML = `
-      <h3>${ticket.title}</h3>
-      <p><strong>Created By:</strong> ${ticket.createdByName}</p>
-      <p><strong>Description:</strong> ${ticket.description}</p>
-      <p><strong>Department:</strong> ${ticket.department}</p>
-      <p><strong>Category:</strong> ${ticket.category}</p>
-      <p><strong>Status:</strong></p>
-      <select id="status-${ticket._id}">
+    // Inside the ticket creation in loadTickets, add:
+// Inside the ticket creation in loadTickets:
+div.innerHTML = `
+    <h3>${ticket.title}</h3>
+    <p><strong>Created By:</strong> ${ticket.createdByName}</p>
+    <p><strong>Description:</strong> ${ticket.description}</p>
+    <p><strong>Department:</strong> ${ticket.department}</p>
+    <p><strong>Category:</strong> ${ticket.category}</p>
+    <p><strong>Status:</strong></p>
+    <select id="status-${ticket._id}">
         <option value="Open" ${ticket.status === 'Open' ? 'selected' : ''}>Open</option>
         <option value="In Progress" ${ticket.status === 'In Progress' ? 'selected' : ''}>In Progress</option>
         <option value="Resolved" ${ticket.status === 'Resolved' ? 'selected' : ''}>Resolved</option>
-      </select>
-      <button onclick="confirmStatusUpdate('${ticket._id}')">Update Status</button>
-      <button onclick="deleteTicket('${ticket._id}')">Delete</button>
-    `;
+    </select>
+    <button onclick="confirmStatusUpdate('${ticket._id}')">Update Status</button>
+    <button onclick="deleteTicket('${ticket._id}')">Delete</button>
+    <button onclick="openChat('${ticket._id}')" class="chat-btn">
+        <i class="fas fa-comments"></i> Chat with Employee
+    </button>
+    <div id="chat-container-${ticket._id}" class="chat-container" style="display: none;">
+        <div id="chat-messages-${ticket._id}" class="chat-messages"></div>
+        <div class="chat-input-container">
+            <input type="text" id="chat-input-${ticket._id}" class="chat-input" placeholder="Type your message...">
+            <button onclick="sendChatMessage('${ticket._id}')" class="chat-btn">Send</button>
+        </div>
+    </div>
+`;
     container.appendChild(div);
   });
 }
@@ -324,6 +349,74 @@ function showChatbotPopup() {
     setTimeout(() => popup.style.display = "none", 1000);
   }, 5000);
 }
+// Add these functions to script.js:
 
+// Function to open chat for a ticket
+function openChat(ticketId) {
+  const chatContainer = document.getElementById(`chat-container-${ticketId}`);
+  if (chatContainer) {
+      chatContainer.style.display = chatContainer.style.display === 'none' ? 'block' : 'none';
+      if (chatContainer.style.display === 'block') {
+          loadChatMessages(ticketId);
+      }
+  }
+}
+
+// Function to load chat messages
+async function loadChatMessages(ticketId) {
+  try {
+      const res = await fetch(`${BASE_URL}/tickets/${ticketId}/chat`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+      });
+      
+      if (!res.ok) throw new Error('Failed to load messages');
+      
+      const messages = await res.json();
+      const chatBox = document.getElementById(`chat-messages-${ticketId}`);
+      chatBox.innerHTML = '';
+      
+      messages.forEach(msg => {
+          const messageDiv = document.createElement('div');
+          // Determine if the message was sent by the current user
+          const isCurrentUser = msg.senderId === localStorage.getItem('userId');
+          messageDiv.className = `chat-message ${isCurrentUser ? 'sent' : 'received'}`;
+          messageDiv.innerHTML = `
+              <strong>${msg.senderName}:</strong> ${msg.message}
+              <small class="message-time">${new Date(msg.createdAt).toLocaleString()}</small>
+          `;
+          chatBox.appendChild(messageDiv);
+      });
+      
+      chatBox.scrollTop = chatBox.scrollHeight;
+  } catch (error) {
+      console.error('Error loading messages:', error);
+      showDialog('❌ Failed to load chat messages', 'error', 'ticketMessageContainer');
+  }
+}
+// Function to send a chat message
+async function sendChatMessage(ticketId) {
+  const input = document.getElementById(`chat-input-${ticketId}`);
+  const message = input.value.trim();
+  
+  if (!message) return;
+  
+  try {
+      const res = await fetch(`${BASE_URL}/tickets/${ticketId}/chat`, {
+          method: 'POST',
+          headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({ message })
+      });
+      
+      if (!res.ok) throw new Error('Failed to send message');
+      
+      input.value = '';
+      loadChatMessages(ticketId);
+  } catch (error) {
+      console.error('Error sending message:', error);
+  }
+}
 // Call the function when the page loads
 window.addEventListener("load", showChatbotPopup);

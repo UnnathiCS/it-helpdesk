@@ -37,6 +37,16 @@ const TicketSchema = new mongoose.Schema({
     createdByName: String,
 });
 const Ticket = mongoose.model('Ticket', TicketSchema);
+//Ticketchat
+const TicketChatSchema = new mongoose.Schema({
+    ticketId: { type: mongoose.Schema.Types.ObjectId, ref: 'Ticket' },
+    senderId: String,
+    senderName: String,
+    message: String,
+    createdAt: { type: Date, default: Date.now }
+});
+const TicketChat = mongoose.model('TicketChat', TicketChatSchema);
+
 
 // Register
 app.post("/register", async (req, res) => {
@@ -138,6 +148,44 @@ app.delete('/tickets/:id', authenticate, async (req, res) => {
     await Ticket.findByIdAndDelete(req.params.id);
     res.json({ message: "✅ Ticket Deleted" });
 });
+// Send message for a specific ticket
+app.post('/tickets/:id/chat', authenticate, async (req, res) => {
+    const { message } = req.body;
+    if (!message) return res.status(400).json({ error: "Message required" });
+
+    const ticket = await Ticket.findById(req.params.id);
+    if (!ticket) return res.status(404).json({ error: "Ticket not found" });
+
+    // Only allow ticket owner or IT staff
+    if (req.user.role !== 'it_staff' && ticket.createdBy !== req.user.userId) {
+        return res.status(403).json({ error: "Access denied" });
+    }
+
+    const chat = new TicketChat({
+        ticketId: req.params.id,
+        senderId: req.user.userId,
+        senderName: req.user.name,
+        message
+    });
+
+    await chat.save();
+    res.json({ message: "Message sent", chat });
+});
+
+// Get all messages for a ticket
+app.get('/tickets/:id/chat', authenticate, async (req, res) => {
+    const ticket = await Ticket.findById(req.params.id);
+    if (!ticket) return res.status(404).json({ error: "Ticket not found" });
+
+    if (req.user.role !== 'it_staff' && ticket.createdBy !== req.user.userId) {
+        return res.status(403).json({ error: "Access denied" });
+    }
+
+    const chats = await TicketChat.find({ ticketId: req.params.id }).sort({ createdAt: 1 });
+    res.json(chats);
+});
+
+  
 
 // Start Server
 app.listen(5000, () => console.log("🚀 Server running on port 5000"));
