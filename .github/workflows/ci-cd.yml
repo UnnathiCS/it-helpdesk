@@ -17,6 +17,30 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v3
 
+    # Set up Python
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: 3.9
+
+    # Install Python dependencies
+    - name: Install Python dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+
+    # Run backend tests with pytest
+    - name: Run backend tests
+      run: |
+        cd backend
+        pytest tests
+
+    # Run frontend tests with pytest
+    - name: Run frontend tests
+      run: |
+        cd frontend
+        pytest tests
+
     # Set up Node.js
     - name: Set up Node.js
       uses: actions/setup-node@v3
@@ -28,18 +52,6 @@ jobs:
       run: |
         cd backend
         npm install
-
-    # Install Python dependencies
-    - name: Install Python dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install -r requirements.txt
-
-    # Run tests
-    - name: Run tests
-      run: |
-        cd backend
-        npm test
 
     # Run system tests
     - name: Run system tests
