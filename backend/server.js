@@ -5,16 +5,28 @@ const cors = require('cors');
 const bodyParser = require('body-parser');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const path = require('path');
 
 const app = express();
 app.use(express.json());
 app.use(cors());
 app.use(bodyParser.urlencoded({ extended: true }));
 
+// Serve static files from the frontend directory
+app.use(express.static(path.join(__dirname, '../frontend')));
+
+// Default route to serve the frontend index.html
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, '../frontend/index.html'));
+});
+
 // MongoDB Connection
-mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
-    .then(() => console.log("✅ MongoDB Connected"))
-    .catch(err => console.log(err));
+mongoose.connect('mongodb://host.docker.internal:27017/it-helpdesk', {
+    useNewUrlParser: true,
+    useUnifiedTopology: true
+})
+.then(() => console.log("✅ MongoDB Connected"))
+.catch(err => console.log(err));
 
 // User Schema
 const UserSchema = new mongoose.Schema({
@@ -46,7 +58,6 @@ const TicketChatSchema = new mongoose.Schema({
     createdAt: { type: Date, default: Date.now }
 });
 const TicketChat = mongoose.model('TicketChat', TicketChatSchema);
-
 
 // Register
 app.post("/register", async (req, res) => {
