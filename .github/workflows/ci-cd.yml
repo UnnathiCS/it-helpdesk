@@ -53,6 +53,10 @@ jobs:
         cd backend
         npm install
 
+    # Build Docker image for testing
+    - name: Build Docker image
+      run: docker build -t it-helpdesk:latest .
+
     # Grant execute permissions for test-system.sh
     - name: Grant execute permissions for test-system.sh
       run: chmod +x ./test-system.sh
