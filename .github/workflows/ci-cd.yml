@@ -53,6 +53,10 @@ jobs:
         cd backend
         npm install
 
+    # Grant execute permissions for test-system.sh
+    - name: Grant execute permissions for test-system.sh
+      run: chmod +x ./test-system.sh
+
     # Run system tests
     - name: Run system tests
       run: ./test-system.sh
