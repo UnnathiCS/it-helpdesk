@@ -37,7 +37,9 @@ jobs:
 
     # Run tests
     - name: Run tests
-      run: npm test
+      run: |
+        cd backend
+        npm test
 
     # Run system tests
     - name: Run system tests
